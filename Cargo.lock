@@ -402,54 +402,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
-name = "coi"
-version = "0.10.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "14174f6d07c7227fb114d79e166a5a5dc43d48e4eca4043646eade3e71161753"
-dependencies = [
- "coi-derive",
- "rustc-hash",
- "thiserror",
-]
-
-[[package]]
-name = "coi-actix-web"
-version = "0.7.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "36382758416aca671f556ce4246953dcd1c23b80b1432e9c6127e10ed246e70d"
-dependencies = [
- "actix-http",
- "actix-service",
- "actix-web",
- "coi",
- "coi-actix-web-derive",
- "futures",
- "log",
-]
-
-[[package]]
-name = "coi-actix-web-derive"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8f0f18ba4a8363e34b5c126f9c1a64ec97b44ba094bf27cc8b72158342e7f10c"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 1.0.109",
-]
-
-[[package]]
-name = "coi-derive"
-version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "00069026ef32ab93e3b2263ed19bac4336ea63b710b14767a6db75eefc8a4652"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 1.0.109",
-]
-
-[[package]]
 name = "concurrent-queue"
 version = "2.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1427,12 +1379,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rustc-hash"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "08d43f7aa6b08d49f382cde6a7982047c3426db949b1424bc4b7ec9ae12c6ce2"
-
-[[package]]
 name = "rustc_version"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1631,8 +1577,8 @@ dependencies = [
  "actix-web",
  "azure_core",
  "azure_data_cosmos",
- "coi",
- "coi-actix-web",
+ "futures",
+ "lazy_static",
  "serde",
  "serde_derive",
  "serde_json",

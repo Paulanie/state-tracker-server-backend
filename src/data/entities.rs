@@ -3,7 +3,6 @@ use serde_derive::Serialize;
 use serde_json::Value;
 
 use azure_data_cosmos::prelude::*;
-use azure_core::Context;
 
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
