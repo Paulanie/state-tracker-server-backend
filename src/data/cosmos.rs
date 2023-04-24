@@ -1,7 +1,6 @@
 use std::sync::Arc;
 use azure_data_cosmos::clients::{CosmosClient, DatabaseClient, CollectionClient};
 use azure_data_cosmos::prelude::{AuthorizationToken, Query, QueryDocuments};
-use coi::Inject;
 use crate::configuration::ApplicationConfig;
 use crate::data::entities::Amendment;
 use crate::configuration::APPCONFIG;

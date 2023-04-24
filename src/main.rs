@@ -1,16 +1,19 @@
+#[macro_use]
+extern crate rbatis;
+extern crate rbdc_mssql;
+
 mod data;
 mod configuration;
+mod domain;
 
 use std::sync::Arc;
-use coi_actix_web::{AppExt, inject};
 use actix_web::{get, post, App, HttpResponse, HttpServer, Responder, web};
 use azure_core::Error;
-use azure_data_cosmos::prelude::{QueryDocumentsResponse, QueryDocuments};
-use coi::container;
-use crate::data::cosmos::{Cosmos};
-use crate::data::entities::Amendment;
 use futures::stream::StreamExt;
+use rbatis::Rbatis;
+use rbdc_mssql::driver::MssqlDriver;
 use crate::configuration::APPCONFIG;
+use crate::domain::amendment::Amendment;
 
 #[macro_use]
 extern crate lazy_static;
@@ -27,35 +30,41 @@ async fn echo(req_body: String) -> impl Responder {
 
 #[get("/amendments")]
 async fn get_amendments(
-    cosmos: web::Data<Cosmos>
+    state: web::Data<AppState>
 ) -> impl Responder {
-    let mut response_stream = cosmos.get(Some(1), None);
-    while let Some(document) = response_stream.next().await {
-        match document {
-            Ok(d) => {
-                println!("{:?}", d);
+    let mut db = &state.pool.clone();
+    let amendments = Amendment::select_by_column(&mut db, "uid", "")
+        .await
+        .map(|data| {
+            println!("Data of size : {}", data.len());
+            for x in data {
+                println!("{}", x);
             }
-            Err(e) => {
-                eprintln!("{}", e);
-            }
-        }
+        });
+
+    match amendments {
+        Ok(_) => { HttpResponse::Ok() }
+        Err(msg) => { HttpResponse::InternalServerError() }
     }
-    HttpResponse::Ok()
+}
+
+#[derive(Clone)]
+struct AppState {
+    pool: Rbatis,
 }
 
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let cosmos = web::Data::new({ Cosmos::new(
-            APPCONFIG.cosmos.account.clone(),
-            APPCONFIG.cosmos.key.clone(),
-            APPCONFIG.cosmos.database.clone(),
-            APPCONFIG.cosmos.collection.clone(),
-        ) });
+    let rb = Rbatis::new();
+    rb.init(MssqlDriver {}, "jdbc:sqlserver://localhost;user=sa;password=Statetracker123;databaseName=StateTracker").expect("Unable to initialize rbatis.");
+    let app_state = AppState {
+        pool: rb
+    };
 
     HttpServer::new(move || {
         App::new()
-            .app_data(cosmos.clone())
+            .app_data(web::Data::new(app_state.clone()))
             .service(hello)
             .service(echo)
             .service(get_amendments)
