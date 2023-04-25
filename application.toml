@@ -1,3 +1,11 @@
 [cosmos]
 database="test"
 key="test"
+
+[main]
+db_type = "Mssql"
+db_host = "localhost"
+db_port = "1433"
+db_user = "sa"
+db_pass = "Statetracker123"
+db_name = "StateTracker"

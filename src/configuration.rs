@@ -5,6 +5,17 @@ use serde_derive::Deserialize;
 #[derive(Deserialize)]
 pub struct ApplicationConfig {
     pub cosmos: CosmosConfig,
+    pub main: MainConfig,
+}
+
+#[derive(Deserialize)]
+pub struct MainConfig {
+    pub db_type: String,
+    pub db_host: String,
+    pub db_port: String,
+    pub db_user: String,
+    pub db_pass: String,
+    pub db_name: String,
 }
 
 #[derive(Deserialize)]

@@ -5,6 +5,7 @@ extern crate rbdc_mssql;
 mod data;
 mod configuration;
 mod domain;
+mod migration;
 
 use std::sync::Arc;
 use actix_web::{get, post, App, HttpResponse, HttpServer, Responder, web};
@@ -14,6 +15,7 @@ use rbatis::Rbatis;
 use rbdc_mssql::driver::MssqlDriver;
 use crate::configuration::APPCONFIG;
 use crate::domain::amendment::Amendment;
+use crate::migration::migrate;
 
 #[macro_use]
 extern crate lazy_static;
@@ -56,6 +58,7 @@ struct AppState {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    migrate().await.unwrap();
     let rb = Rbatis::new();
     rb.init(MssqlDriver {}, "jdbc:sqlserver://localhost;user=sa;password=Statetracker123;databaseName=StateTracker").expect("Unable to initialize rbatis.");
     let app_state = AppState {

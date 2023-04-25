@@ -14,7 +14,11 @@ lazy_static = "1.4.0"
 rbatis = "4.3.0"
 rbdc-mssql = "4.3.0"
 rbs = "4.3.2"
+refinery = { version = "0.8.7", features = ["tiberius", "tiberius-config"] }
 serde = { version = "1.0.160", features = ["derive"] }
 serde_derive = "1.0.160"
 serde_json = "1.0.96"
+tiberius = { version = "0.12.2", features = ["tokio", "tokio-util"] }
+tokio = "1.28.0"
+tokio-util = "0.7.8"
 toml = "0.7.3"
