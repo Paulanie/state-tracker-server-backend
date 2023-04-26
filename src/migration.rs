@@ -1,4 +1,3 @@
-use azure_core::headers::APP;
 use rbdc_mssql::MssqlConnection;
 use refinery::config::{Config, ConfigDbType};
 use refinery::Error;
