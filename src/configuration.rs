@@ -32,3 +32,14 @@ lazy_static!(
             .map(|env| toml::from_str::<ApplicationConfig>(env.as_str()).expect("Unable to load Application Configuration data."))
             .expect("An error occurred when loading application configuration file.");
 );
+
+impl MainConfig {
+    pub fn db_connection_string(&self) -> String {
+        format!("jdbc:sqlserver://{}:{};user={};password={};databaseName={}",
+                self.db_host,
+                self.db_port,
+                self.db_user,
+                self.db_pass,
+                self.db_name)
+    }
+}

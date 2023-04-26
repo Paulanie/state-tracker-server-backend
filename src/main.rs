@@ -10,12 +10,14 @@ mod migration;
 use std::sync::Arc;
 use actix_web::{get, post, App, HttpResponse, HttpServer, Responder, web};
 use azure_core::Error;
+use azure_core::headers::APP;
 use futures::stream::StreamExt;
 use rbatis::Rbatis;
 use rbdc_mssql::driver::MssqlDriver;
 use crate::configuration::APPCONFIG;
 use crate::domain::amendment::Amendment;
 use crate::migration::migrate;
+use log::{info, warn};
 
 #[macro_use]
 extern crate lazy_static;
@@ -58,9 +60,12 @@ struct AppState {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    info!(target: "database", "Migrating database");
     migrate().await.unwrap();
+
     let rb = Rbatis::new();
-    rb.init(MssqlDriver {}, "jdbc:sqlserver://localhost;user=sa;password=Statetracker123;databaseName=StateTracker").expect("Unable to initialize rbatis.");
+    rb.init(MssqlDriver {}, APPCONFIG.main.db_connection_string().to_owned().as_str()).expect("Unable to initialize rbatis.");
+
     let app_state = AppState {
         pool: rb
     };

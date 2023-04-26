@@ -1,6 +1,8 @@
 [cosmos]
-database="test"
-key="test"
+database = "test"
+key = "test"
+account = ""
+collection = ""
 
 [main]
 db_type = "Mssql"

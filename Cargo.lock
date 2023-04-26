@@ -2566,6 +2566,7 @@ dependencies = [
  "azure_data_cosmos",
  "futures",
  "lazy_static",
+ "log",
  "rbatis",
  "rbdc-mssql",
  "rbs",

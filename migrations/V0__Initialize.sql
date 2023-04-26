@@ -12,3 +12,5 @@ CREATE TABLE Amendments
     representation     NVARCHAR(256),
     article99          BIT
 );
+
+CREATE NONCLUSTERED INDEX ncix_amendments_dateDepot ON Amendments (dateDepot);
