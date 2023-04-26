@@ -14,3 +14,4 @@ CREATE TABLE Amendments
 );
 
 CREATE NONCLUSTERED INDEX ncix_amendments_dateDepot ON Amendments (dateDepot);
+CREATE NONCLUSTERED INDEX ncix_amendments_etat ON Amendments(etat);

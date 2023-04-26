@@ -2,13 +2,12 @@
 extern crate rbatis;
 extern crate rbdc_mssql;
 
-mod data;
 mod configuration;
 mod domain;
 mod migration;
 
 use std::sync::Arc;
-use actix_web::{get, post, App, HttpResponse, HttpServer, Responder, web};
+use actix_web::{get, post, App, HttpResponse, HttpServer, Responder, web, middleware::Logger};
 use azure_core::Error;
 use azure_core::headers::APP;
 use futures::stream::StreamExt;
@@ -17,7 +16,6 @@ use rbdc_mssql::driver::MssqlDriver;
 use crate::configuration::APPCONFIG;
 use crate::domain::amendment::Amendment;
 use crate::migration::migrate;
-use log::{info, warn};
 
 #[macro_use]
 extern crate lazy_static;
@@ -60,7 +58,8 @@ struct AppState {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    info!(target: "database", "Migrating database");
+    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
+
     migrate().await.unwrap();
 
     let rb = Rbatis::new();
@@ -70,12 +69,15 @@ async fn main() -> std::io::Result<()> {
         pool: rb
     };
 
+
+
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(app_state.clone()))
             .service(hello)
             .service(echo)
             .service(get_amendments)
+            .wrap(Logger::default())
     })
         .bind(("127.0.0.1", 8080))?
         .run()
