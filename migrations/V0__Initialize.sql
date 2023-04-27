@@ -26,17 +26,21 @@ CREATE TABLE Actors
     [trigram]      CHAR(3),
     [birthdate]    DATE,
     [birthplace]   NVARCHAR(512),
-    [isDead]       BIT,
-    [professionId] INT FOREIGN KEY REFERENCES Professions (id)
+    [deathDate]    DATE          NULL,
+    [uriHatvp]     NVARCHAR(512) NULL,
+    [professionId] INT FOREIGN KEY REFERENCES Professions (id),
 );
 
 CREATE TABLE Professions
 (
     [id]       INT IDENTITY (1,1) PRIMARY KEY,
-    [name]     NVARCHAR(512),
+    [name]     NVARCHAR(512) UNIQUE,
     [family]   NVARCHAR(512),
     [category] NVARCHAR(512)
 );
+
+CREATE NONCLUSTERED INDEX ncix_professions_name ON Professions (name);
+
 
 CREATE TABLE ActorPostalAddresses
 (
@@ -103,6 +107,7 @@ CREATE TABLE Mandates
 CREATE TABLE ParliamentaryMandates
 (
     [uid]                      VARCHAR(32) PRIMARY KEY,
+    [actorUid]                 VARCHAR(32) FOREIGN KEY REFERENCES Actors (uid),
     [termOfOffice]             VARCHAR(4)                                                     NULL,
     [organType]                VARCHAR(16),
     [startDate]                DATE,
