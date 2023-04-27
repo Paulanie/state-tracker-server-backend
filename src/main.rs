@@ -8,22 +8,12 @@ mod migration;
 mod api;
 
 use std::process::exit;
-use actix_web::{get, post, App, HttpResponse, HttpServer, Responder, web, middleware::Logger};
+use actix_web::{App, HttpServer, web, middleware::Logger};
 use rbatis::{Rbatis};
 use rbdc_mssql::driver::MssqlDriver;
 use log::{error, info};
 use crate::configuration::APPCONFIG;
 use crate::migration::migrate;
-
-#[get("/")]
-async fn hello() -> impl Responder {
-    HttpResponse::Ok().body("Hello !")
-}
-
-#[post("/echo")]
-async fn echo(req_body: String) -> impl Responder {
-    HttpResponse::Ok().body(req_body)
-}
 
 
 #[derive(Clone)]
@@ -73,7 +63,6 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(app_state.clone()))
-            .service(hello)
             .configure(api::amendments::config)
             .wrap(Logger::default())
     })
