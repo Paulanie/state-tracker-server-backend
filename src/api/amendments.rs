@@ -1,9 +1,10 @@
-use actix_web::{Responder, web};
+use actix_web::{Responder, web, get};
 use rbatis::sql::PageRequest;
 use crate::api::common::{Page, return_data, return_single_data, SortOrder};
 use crate::AppState;
 use crate::domain::amendment::Amendments;
 
+#[get("/amendments")]
 async fn list(
     state: web::Data<AppState>,
     page: web::Query<Page>,
@@ -20,6 +21,7 @@ async fn list(
     return_data(amendments)
 }
 
+#[get("/amendments/{id}")]
 async fn get(
     state: web::Data<AppState>,
     path: web::Path<String>,
@@ -32,12 +34,6 @@ async fn get(
 }
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(
-        web::resource("/amendments")
-            .route(web::get().to(list))
-    );
-    cfg.service(
-        web::resource("/amendments/{id}")
-            .route(web::get().to(get))
-    );
+    cfg.service(list)
+        .service(get);
 }
