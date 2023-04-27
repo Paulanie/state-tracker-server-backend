@@ -1,4 +1,3 @@
-
 use rbatis::rbdc::datetime::DateTime;
 use serde_derive::Serialize;
 use serde_derive::Deserialize;
@@ -7,7 +6,16 @@ use std::fmt;
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Amendments {
     pub uid: String,
+    pub examenRef: String,
+    pub triAmendement: String,
+    pub texteLegislatifRef: String,
     pub dateDepot: DateTime,
+    pub datePublication: DateTime,
+    pub dateSort: Option<DateTime>,
+    pub etat: String,
+    pub sousEtat: String,
+    pub representation: String,
+    pub article99: bool,
 }
 
 impl fmt::Display for Amendments {
@@ -17,5 +25,7 @@ impl fmt::Display for Amendments {
 }
 
 crud!(Amendments{});
-impl_select_page!(Amendments{select_all_paginated(order_by: &str) => "`ORDER BY [#{order_by}] OFFSET ${page_size} * ${page_no} ROWS FETCH NEXT ${page_size} ROWS ONLY`"});
+impl_select_page!(Amendments{select_all_paginated(order_by: &str) => "
+    if !sql.contains('count'):
+        `order by ${order_by} offset ${page_size} * ${page_no} rows fetch next ${page_size} rows only --`"});
 impl_select_page!(Amendments{select_by_uid_paginated(uid:&str) => "`where uid = #{name}`"});
