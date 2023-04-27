@@ -35,4 +35,4 @@ crud!(Amendments{});
 impl_select_page!(Amendments{select_all_paginated_by_date_depot() => "
     if !sql.contains('count'):
         `order by dateDepot desc offset ${page_size} * ${page_no} rows fetch next ${page_size} rows only --`"});
-impl_select_page!(Amendments{select_by_uid_paginated(uid:&str) => "`where uid = #{name}`"});
+impl_select!(Amendments{select_by_uid(uid:String) -> Option => "`where uid = #{uid}`"});

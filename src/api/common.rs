@@ -1,4 +1,3 @@
-use actix_web::http::header::ContentType;
 use actix_web::{HttpResponse, Responder};
 use log::error;
 use rbatis::rbdc::Error;
@@ -25,11 +24,28 @@ pub fn return_data<T>(entity: Result<rbatis::sql::Page<T>, Error>) -> impl Respo
 {
     match entity {
         Ok(results) => {
-            let body = serde_json::to_string(&results.records).unwrap();
-            HttpResponse::Ok().content_type(ContentType::json()).body(body)
+            HttpResponse::Ok().json(&results.records)
         }
-        Err(msg) => {
-            error!("An error occured : {}", msg);
+        Err(err) => {
+            error!("An error occured : {}", err);
+            HttpResponse::InternalServerError().finish()
+        }
+    }
+}
+
+pub fn return_single_data<T>(entity: Result<Option<T>, Error>) -> impl Responder
+    where
+        T: serde::Serialize,
+{
+    match entity {
+        Ok(result) => {
+            match result {
+                None => HttpResponse::NotFound().finish(),
+                Some(e) => HttpResponse::Ok().json(e)
+            }
+        }
+        Err(err) => {
+            error!("An error occured : {}", err);
             HttpResponse::InternalServerError().finish()
         }
     }
