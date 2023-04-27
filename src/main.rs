@@ -9,7 +9,7 @@ mod api;
 
 use std::process::exit;
 use actix_web::{get, post, App, HttpResponse, HttpServer, Responder, web, middleware::Logger};
-use rbatis::Rbatis;
+use rbatis::{Rbatis};
 use rbdc_mssql::driver::MssqlDriver;
 use log::{error, info};
 use crate::configuration::APPCONFIG;
@@ -56,12 +56,20 @@ async fn main() -> std::io::Result<()> {
     }
 
     let rb = Rbatis::new();
-    rb.init(MssqlDriver {}, APPCONFIG.main.db_connection_string().to_owned().as_str()).expect("Unable to initialize rbatis.");
+    rb.init(MssqlDriver {}, APPCONFIG.main.db_connection_string().to_owned().as_str()).unwrap();
+    match rb.exec("SELECT CURRENT_USER", vec!()).await {
+        Ok(_) => { info!("Connection to database successful") }
+        Err(error) => {
+            error!("Unable to query database, error : {}", error.to_string());
+            exit(1)
+        }
+    }
 
     let app_state = AppState {
         pool: rb,
     };
 
+    info!("Starting Actix-Web Server");
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(app_state.clone()))
