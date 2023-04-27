@@ -20,7 +20,7 @@ pub struct Amendments {
     pub date_sort: Option<DateTime>,
     pub etat: String,
     #[serde(rename = "sousEtat")]
-    pub sous_etat: String,
+    pub sous_etat: Option<String>,
     pub representation: String,
     pub article99: bool,
 }
@@ -34,5 +34,5 @@ impl fmt::Display for Amendments {
 crud!(Amendments{});
 impl_select_page!(Amendments{select_all_paginated_by_date_depot() => "
     if !sql.contains('count'):
-        `order by dateDepot offset ${page_size} * ${page_no} rows fetch next ${page_size} rows only --`"});
+        `order by dateDepot desc offset ${page_size} * ${page_no} rows fetch next ${page_size} rows only --`"});
 impl_select_page!(Amendments{select_by_uid_paginated(uid:&str) => "`where uid = #{name}`"});
