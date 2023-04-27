@@ -1,6 +1,6 @@
 use actix_web::{Responder, web};
 use rbatis::sql::PageRequest;
-use crate::api::common::{Page, return_data, return_single_data};
+use crate::api::common::{Page, return_data, return_single_data, SortOrder};
 use crate::AppState;
 use crate::domain::amendment::Amendments;
 
@@ -9,7 +9,12 @@ async fn list(
     page: web::Query<Page>,
 ) -> impl Responder {
     let mut db = &state.pool.clone();
-    let amendments = Amendments::select_all_paginated_by_date_depot(&mut db, &PageRequest::new(page.page, page.size))
+    let amendments = Amendments::select_all_paginated(
+        &mut db,
+        &PageRequest::new(page.page.unwrap_or(1), page.size.unwrap_or(20)),
+        page.ordering.clone().unwrap_or(String::from("dateDepot")).as_str(),
+        page.sort_order.clone().unwrap_or(SortOrder::Asc).as_str(),
+    )
         .await;
 
     return_data(amendments)

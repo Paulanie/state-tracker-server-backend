@@ -3,19 +3,29 @@ use log::error;
 use rbatis::rbdc::Error;
 use serde::Deserialize;
 
-#[derive(Deserialize)]
-pub struct Page {
-    pub page: u64,
-    pub size: u64,
+#[derive(Deserialize, Clone, Copy)]
+pub enum SortOrder {
+    #[serde(rename = "asc")]
+    Asc,
+    #[serde(rename = "desc")]
+    Desc,
 }
 
-impl Default for Page {
-    fn default() -> Self {
-        Page {
-            page: 1,
-            size: 20,
+impl SortOrder {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            SortOrder::Asc => "asc",
+            SortOrder::Desc => "desc",
         }
     }
+}
+
+#[derive(Deserialize)]
+pub struct Page {
+    pub page: Option<u64>,
+    pub size: Option<u64>,
+    pub ordering: Option<String>,
+    pub sort_order: Option<SortOrder>
 }
 
 pub fn return_data<T>(entity: Result<rbatis::sql::Page<T>, Error>) -> impl Responder
@@ -24,7 +34,7 @@ pub fn return_data<T>(entity: Result<rbatis::sql::Page<T>, Error>) -> impl Respo
 {
     match entity {
         Ok(results) => {
-            HttpResponse::Ok().json(&results.records)
+            HttpResponse::Ok().json(&results)
         }
         Err(err) => {
             error!("An error occured : {}", err);

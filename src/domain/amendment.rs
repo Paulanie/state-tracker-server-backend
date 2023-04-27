@@ -13,9 +13,9 @@ pub struct Amendments {
     #[serde(rename = "texteLegislatifRef")]
     pub texte_legislatif_ref: String,
     #[serde(rename = "dateDepot")]
-    pub date_depot: DateTime,
+    pub date_depot: Option<DateTime>,
     #[serde(rename = "datePublication")]
-    pub date_publication: DateTime,
+    pub date_publication: Option<DateTime>,
     #[serde(rename = "dateSort")]
     pub date_sort: Option<DateTime>,
     pub etat: String,
@@ -32,7 +32,7 @@ impl fmt::Display for Amendments {
 }
 
 crud!(Amendments{});
-impl_select_page!(Amendments{select_all_paginated_by_date_depot() => "
+impl_select_page!(Amendments{select_all_paginated(order_by: &str, sort_order: &str) => "
     if !sql.contains('count'):
-        `order by dateDepot desc offset ${page_size} * ${page_no} rows fetch next ${page_size} rows only --`"});
+        `order by ${order_by} ${sort_order}, uid offset ${page_size} * ${page_no} rows fetch next ${page_size} rows only --`"});
 impl_select!(Amendments{select_by_uid(uid:String) -> Option => "`where uid = #{uid}`"});
