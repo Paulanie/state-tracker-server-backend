@@ -6,14 +6,21 @@ use std::fmt;
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Amendments {
     pub uid: String,
-    pub examenRef: String,
-    pub triAmendement: String,
-    pub texteLegislatifRef: String,
-    pub dateDepot: DateTime,
-    pub datePublication: DateTime,
-    pub dateSort: Option<DateTime>,
+    #[serde(rename = "examenRef")]
+    pub examen_ref: String,
+    #[serde(rename = "triAmendement")]
+    pub tri_amendement: String,
+    #[serde(rename = "texteLegislatifRef")]
+    pub texte_legislatif_ref: String,
+    #[serde(rename = "dateDepot")]
+    pub date_depot: DateTime,
+    #[serde(rename = "datePublication")]
+    pub date_publication: DateTime,
+    #[serde(rename = "dateSort")]
+    pub date_sort: Option<DateTime>,
     pub etat: String,
-    pub sousEtat: String,
+    #[serde(rename = "sousEtat")]
+    pub sous_etat: String,
     pub representation: String,
     pub article99: bool,
 }
@@ -25,7 +32,7 @@ impl fmt::Display for Amendments {
 }
 
 crud!(Amendments{});
-impl_select_page!(Amendments{select_all_paginated(order_by: &str) => "
+impl_select_page!(Amendments{select_all_paginated_by_date_depot() => "
     if !sql.contains('count'):
-        `order by ${order_by} offset ${page_size} * ${page_no} rows fetch next ${page_size} rows only --`"});
+        `order by dateDepot offset ${page_size} * ${page_no} rows fetch next ${page_size} rows only --`"});
 impl_select_page!(Amendments{select_by_uid_paginated(uid:&str) => "`where uid = #{name}`"});

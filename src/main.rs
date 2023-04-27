@@ -7,17 +7,13 @@ mod domain;
 mod migration;
 mod api;
 
-use std::sync::Arc;
+use std::process::exit;
 use actix_web::{get, post, App, HttpResponse, HttpServer, Responder, web, middleware::Logger};
-use futures::stream::StreamExt;
 use rbatis::Rbatis;
 use rbdc_mssql::driver::MssqlDriver;
+use log::{error, info};
 use crate::configuration::APPCONFIG;
-use crate::domain::amendment::Amendments;
 use crate::migration::migrate;
-
-#[macro_use]
-extern crate lazy_static;
 
 #[get("/")]
 async fn hello() -> impl Responder {
@@ -40,7 +36,24 @@ struct AppState {
 async fn main() -> std::io::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
 
-    migrate().await.unwrap();
+    info!("
+   _____ _        _         _______             _
+  / ____| |      | |       |__   __|           | |
+ | (___ | |_ __ _| |_ ___     | |_ __ __ _  ___| | _____ _ __
+  \\___ \\| __/ _` | __/ _ \\    | | '__/ _` |/ __| |/ / _ \\ '__|
+  ____) | || (_| | ||  __/    | | | | (_| | (__|   <  __/ |
+ |_____/ \\__\\__,_|\\__\\___|    |_|_|  \\__,_|\\___|_|\\_\\___|_|
+
+                                                              ");
+    info!("Starting State Tracker Server");
+    info!("Applying SQL Migrations ...");
+    match migrate().await {
+        Ok(_) => { info!("Migration successful") }
+        Err(error) => {
+            error!("Migration failed, error : {}", error.to_string());
+            exit(1)
+        }
+    }
 
     let rb = Rbatis::new();
     rb.init(MssqlDriver {}, APPCONFIG.main.db_connection_string().to_owned().as_str()).expect("Unable to initialize rbatis.");

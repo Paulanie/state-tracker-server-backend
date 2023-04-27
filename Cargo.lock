@@ -2333,6 +2333,7 @@ dependencies = [
  "env_logger 0.10.0",
  "futures",
  "lazy_static",
+ "log",
  "rbatis",
  "rbdc-mssql",
  "rbs",

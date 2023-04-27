@@ -10,7 +10,7 @@ async fn list(
     page: web::Query<Page>
 ) -> impl Responder {
     let mut db = &state.pool.clone();
-    let amendments = Amendments::select_all_paginated(&mut db, &PageRequest::new(page.page, page.size), "dateDepot")
+    let amendments = Amendments::select_all_paginated_by_date_depot(&mut db, &PageRequest::new(page.page, page.size))
         .await;
 
     match amendments {
@@ -18,7 +18,7 @@ async fn list(
             let body = serde_json::to_string(&results.records).unwrap();
             HttpResponse::Ok().content_type(ContentType::json()).body(body)
         }
-        Err(msg) => { HttpResponse::InternalServerError().finish() }
+        Err(msg) => { HttpResponse::InternalServerError().body(msg.to_string()) }
     }
 }
 
