@@ -12,9 +12,9 @@ async fn list(
     let mut db = &state.pool.clone();
     let amendments = Amendments::select_all_paginated(
         &mut db,
-        &PageRequest::new(page.page.unwrap_or(1), page.size.unwrap_or(20)),
+        &PageRequest::new(page.page, page.size),
         page.ordering.clone().unwrap_or(String::from("dateDepot")).as_str(),
-        page.sort_order.clone().unwrap_or(SortOrder::Asc).as_str(),
+        page.sort_order.clone().as_str(),
     )
         .await;
 
