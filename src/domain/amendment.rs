@@ -6,21 +6,21 @@ use std::fmt;
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Amendments {
     pub uid: String,
-    #[serde(rename = "examenRef")]
-    pub examen_ref: String,
-    #[serde(rename = "triAmendement")]
-    pub tri_amendement: String,
-    #[serde(rename = "texteLegislatifRef")]
-    pub texte_legislatif_ref: String,
-    #[serde(rename = "dateDepot")]
-    pub date_depot: Option<DateTime>,
-    #[serde(rename = "datePublication")]
-    pub date_publication: Option<DateTime>,
-    #[serde(rename = "dateSort")]
-    pub date_sort: Option<DateTime>,
-    pub etat: String,
-    #[serde(rename = "sousEtat")]
-    pub sous_etat: Option<String>,
+    #[serde(rename = "examinationRef")]
+    pub examination_ref: String,
+    #[serde(rename = "triAmendment")]
+    pub tri_amendment: String,
+    #[serde(rename = "legislativeTextRef")]
+    pub legislative_text_ref: String,
+    #[serde(rename = "deliveryDate")]
+    pub delivery_date: Option<DateTime>,
+    #[serde(rename = "publicationDate")]
+    pub publication_date: Option<DateTime>,
+    #[serde(rename = "sortDate")]
+    pub sort_date: Option<DateTime>,
+    pub state: String,
+    #[serde(rename = "subState")]
+    pub sub_state: Option<String>,
     pub representation: String,
     pub article99: bool,
 }
