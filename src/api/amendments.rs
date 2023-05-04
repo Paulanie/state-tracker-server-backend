@@ -1,14 +1,15 @@
 use actix_web::{Responder, web, get};
-use rbatis::sql::PageRequest;
-use crate::api::common::{Page, return_paginated_data, return_single_data};
+use actix_web::web::Json;
+use rbatis::sql::{Page, PageRequest};
+use crate::api::common::{DatabaseError, PaginationRequest, return_paginated_data, return_single_data};
 use crate::AppState;
 use crate::domain::amendment::Amendments;
 
 #[get("/amendments")]
 async fn list(
     state: web::Data<AppState>,
-    page: web::Query<Page>,
-) -> impl Responder {
+    page: web::Query<PaginationRequest>,
+) -> Result<Json<Page<Amendments>>, DatabaseError> {
     let mut db = &state.pool.clone();
     let amendments = Amendments::select_all_paginated(
         &mut db,
@@ -18,19 +19,19 @@ async fn list(
     )
         .await;
 
-    return_paginated_data(amendments)
+    Ok(Json(amendments?))
 }
 
 #[get("/amendments/{id}")]
 async fn get(
     state: web::Data<AppState>,
     path: web::Path<String>,
-) -> impl Responder {
+) -> Result<Json<Option<Amendments>>, DatabaseError> {
     let mut db = &state.pool.clone();
     let uid = path.into_inner();
     let amendment = Amendments::select_by_uid(&mut db, uid).await;
 
-    return_single_data(amendment)
+    Ok(Json(amendment?))
 }
 
 pub fn config(cfg: &mut web::ServiceConfig) {

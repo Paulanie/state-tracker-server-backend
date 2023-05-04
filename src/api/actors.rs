@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 use actix_web::{Responder, web, get};
 use actix_web::web::Json;
-use rbatis::sql::{PageRequest};
-use crate::api::common::{build_result_page, DatabaseError, Page, return_single_data};
+use rbatis::sql::{Page, PageRequest};
+use crate::api::common::{build_result_page, DatabaseError, PaginationRequest, return_single_data};
 use crate::AppState;
 use crate::domain::actor::Actors;
 use crate::api::dto::actors::ActorsDTO;
@@ -12,8 +12,8 @@ use crate::domain::profession::Professions;
 #[get("/actors")]
 async fn list(
     state: web::Data<AppState>,
-    page: web::Query<Page>,
-) -> Result<Json<rbatis::sql::Page<ActorsDTO>>, DatabaseError> {
+    page: web::Query<PaginationRequest>,
+) -> Result<Json<Page<ActorsDTO>>, DatabaseError> {
     let mut db_pool = &state.pool.clone();
     let page_request = PageRequest::new(page.page, page.size);
     let ordering = page.ordering.clone().unwrap_or_else(|| "trigram".to_string());
@@ -40,12 +40,12 @@ async fn list(
 async fn get(
     state: web::Data<AppState>,
     path: web::Path<String>,
-) -> impl Responder {
+) -> Result<Json<Option<Actors>>, DatabaseError> {
     let mut db = &state.pool.clone();
     let uid = path.into_inner();
     let actors = Actors::select_by_uid(&mut db, uid).await;
 
-    return_single_data(actors)
+    Ok(Json(actors?))
 }
 
 pub fn config(cfg: &mut web::ServiceConfig) {
