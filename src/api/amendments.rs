@@ -26,12 +26,12 @@ async fn list(
 async fn get(
     state: web::Data<AppState>,
     path: web::Path<String>,
-) -> Result<Json<Option<Amendments>>, DatabaseError> {
+) -> Result<Option<Json<Amendments>>, DatabaseError> {
     let mut db = &state.pool.clone();
     let uid = path.into_inner();
     let amendment = Amendments::select_by_uid(&mut db, uid).await;
 
-    Ok(Json(amendment?))
+    Ok(amendment?.map(Json))
 }
 
 pub fn config(cfg: &mut web::ServiceConfig) {

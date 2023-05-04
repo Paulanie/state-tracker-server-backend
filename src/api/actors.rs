@@ -40,12 +40,12 @@ async fn list(
 async fn get(
     state: web::Data<AppState>,
     path: web::Path<String>,
-) -> Result<Json<Option<Actors>>, DatabaseError> {
+) -> Result<Option<Json<Actors>>, DatabaseError> {
     let mut db = &state.pool.clone();
     let uid = path.into_inner();
     let actors = Actors::select_by_uid(&mut db, uid).await;
 
-    Ok(Json(actors?))
+    Ok(actors?.map(Json))
 }
 
 pub fn config(cfg: &mut web::ServiceConfig) {
