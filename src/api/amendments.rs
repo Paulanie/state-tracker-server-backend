@@ -1,6 +1,6 @@
 use actix_web::{Responder, web, get};
 use rbatis::sql::PageRequest;
-use crate::api::common::{Page, return_data, return_single_data};
+use crate::api::common::{Page, return_paginated_data, return_single_data};
 use crate::AppState;
 use crate::domain::amendment::Amendments;
 
@@ -18,7 +18,7 @@ async fn list(
     )
         .await;
 
-    return_data(amendments)
+    return_paginated_data(amendments)
 }
 
 #[get("/amendments/{id}")]
