@@ -1,8 +1,8 @@
 use std::collections::HashMap;
-use actix_web::{Responder, web, get};
+use actix_web::{web, get};
 use actix_web::web::Json;
 use rbatis::sql::{Page, PageRequest};
-use crate::api::common::{build_result_page, DatabaseError, PaginationRequest, return_single_data};
+use crate::api::common::{build_result_page, DatabaseError, PaginationRequest};
 use crate::AppState;
 use crate::domain::actor::Actors;
 use crate::api::dto::actors::ActorsDTO;

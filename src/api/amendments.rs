@@ -1,7 +1,7 @@
-use actix_web::{Responder, web, get};
+use actix_web::{web, get};
 use actix_web::web::Json;
 use rbatis::sql::{Page, PageRequest};
-use crate::api::common::{DatabaseError, PaginationRequest, return_paginated_data, return_single_data};
+use crate::api::common::{DatabaseError, PaginationRequest};
 use crate::AppState;
 use crate::domain::amendment::Amendments;
 
