@@ -12,14 +12,38 @@ use actix_web::{App, HttpServer, web, middleware::Logger};
 use rbatis::{Rbatis};
 use rbdc_mssql::driver::MssqlDriver;
 use log::{error, info};
+use utoipa::OpenApi;
+use utoipa_swagger_ui::SwaggerUi;
 use crate::configuration::APPCONFIG;
 use crate::migration::migrate;
 
 
 #[derive(Clone)]
-struct AppState {
+pub struct AppState {
     pool: Rbatis,
 }
+
+#[derive(OpenApi)]
+    #[openapi(
+        paths(
+            api::amendments::list,
+            api::amendments::get,
+            api::actors::list,
+            api::actors::get
+        ),
+        components(
+            schemas(api::dto::amendments::AmendmentsDTO),
+            schemas(api::dto::actors::ActorsDTO),
+            schemas(api::dto::actors::ProfessionsDTO),
+            schemas(api::common::SortOrder),
+            schemas(api::common::ActorsPageResult),
+            schemas(api::common::AmendmentsPageResult),
+        ),
+        tags(
+            (name = "todo", description = "Todo management endpoints.")
+        ),
+    )]
+struct ApiDoc;
 
 
 #[actix_web::main]
@@ -59,12 +83,18 @@ async fn main() -> std::io::Result<()> {
         pool: rb,
     };
 
+    let openapi = ApiDoc::openapi();
+
     info!("Starting Actix-Web Server");
+    info!("Swagger UI can be found on : http://127.0.0.1:8080/swagger-ui/");
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(app_state.clone()))
             .configure(api::amendments::config)
             .configure(api::actors::config)
+            .service(
+                SwaggerUi::new("/swagger-ui/{_:.*}").url("/api-docs/openapi.json", openapi.clone()),
+            )
             .wrap(Logger::default())
     })
         .bind(("127.0.0.1", 8080))?

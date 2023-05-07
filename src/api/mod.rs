@@ -1,6 +1,6 @@
 pub mod amendments;
 pub mod actors;
-mod common;
-mod dto;
+pub mod common;
+pub mod dto;
 
 

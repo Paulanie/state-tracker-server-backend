@@ -1,15 +1,22 @@
 use actix_web::{web, get};
 use actix_web::web::Json;
-use rbatis::sql::{Page, PageRequest};
-use crate::api::common::{DatabaseError, PaginationRequest};
+use rbatis::sql::{PageRequest};
+use crate::api::common::{AmendmentsPageResult, build_result_page, DatabaseError, PageResult, PaginationRequest};
+use crate::api::dto::amendments::AmendmentsDTO;
 use crate::AppState;
 use crate::domain::amendment::Amendments;
 
+#[utoipa::path(
+    params(PaginationRequest),
+    responses(
+        (status = 200, description = "The amendments found.", body = AmendmentsPageResult),
+    )
+)]
 #[get("/amendments")]
-async fn list(
+pub async fn list(
     state: web::Data<AppState>,
     page: web::Query<PaginationRequest>,
-) -> Result<Json<Page<Amendments>>, DatabaseError> {
+) -> Result<Json<AmendmentsPageResult>, DatabaseError> {
     let mut db = &state.pool.clone();
     let amendments = Amendments::select_all_paginated(
         &mut db,
@@ -19,19 +26,31 @@ async fn list(
     )
         .await;
 
-    Ok(Json(amendments?))
+
+    Ok(amendments
+        .map(|a| build_result_page(a.page_no, a.page_size, a.total, AmendmentsDTO::from_entities(a.records.iter().collect())))
+        .map(Json)?)
 }
 
+#[utoipa::path(
+    params(
+        ("id", description = "The id of the amendment")
+    ),
+    responses(
+        (status = 200, description = "The amendment with the requested ID", body = AmendmentsDTO),
+        (status = 404, description = "Amendment not found", body = ErrorResponse)
+    )
+)]
 #[get("/amendments/{id}")]
-async fn get(
+pub async fn get(
     state: web::Data<AppState>,
     path: web::Path<String>,
-) -> Result<Option<Json<Amendments>>, DatabaseError> {
+) -> Result<Option<Json<AmendmentsDTO>>, DatabaseError> {
     let mut db = &state.pool.clone();
     let uid = path.into_inner();
     let amendment = Amendments::select_by_uid(&mut db, uid).await;
 
-    Ok(amendment?.map(Json))
+    Ok(amendment?.map(|a| Json(AmendmentsDTO::from_entity(&a))))
 }
 
 pub fn config(cfg: &mut web::ServiceConfig) {

@@ -1,10 +1,12 @@
 use rbatis::rbdc::Error;
-use serde::Deserialize;
+use serde::{Deserialize};
 use std::default::Default;
 use std::fmt::{Debug, Display, Formatter};
-use rbatis::sql::IPage;
+use serde_derive::Serialize;
+use utoipa::{IntoParams, ToSchema};
+use crate::api::dto::{actors::{ActorsDTO}, amendments::{AmendmentsDTO}};
 
-#[derive(Deserialize, Clone, Copy, Default)]
+#[derive(Deserialize, Clone, Copy, Default, ToSchema)]
 pub enum SortOrder {
     #[serde(rename = "asc")]
     #[default]
@@ -22,7 +24,7 @@ impl SortOrder {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, IntoParams)]
 pub struct PaginationRequest {
     #[serde(default = "page_default")]
     pub page: u64,
@@ -37,9 +39,25 @@ fn page_default() -> u64 { 1 }
 
 fn size_default() -> u64 { 10 }
 
-pub fn build_result_page<T>(page_no: u64, page_size: u64, total: u64, records: Vec<T>) -> rbatis::sql::Page<T> {
-    rbatis::sql::Page::<T>::new_total(page_no, page_size, total)
-        .set_records(records)
+#[derive(Serialize, ToSchema)]
+#[aliases(ActorsPageResult = PageResult<ActorsDTO>,
+          AmendmentsPageResult = PageResult<AmendmentsDTO>,)]
+pub struct PageResult<T> where T: serde::Serialize {
+    total: u64,
+    pages: u64,
+    page_no: u64,
+    page_size: u64,
+    records: Vec<T>,
+}
+
+pub fn build_result_page<T>(page_no: u64, page_size: u64, total: u64, records: Vec<T>) -> PageResult<T> where T: serde::Serialize {
+    PageResult {
+        total,
+        pages: (total as f64 / page_size as f64).ceil() as u64,
+        page_no,
+        page_size,
+        records,
+    }
 }
 
 pub struct DatabaseError {

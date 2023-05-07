@@ -2,8 +2,9 @@ use rbatis::rbdc::datetime::DateTime;
 use serde_derive::Serialize;
 use crate::domain::actor::Actors;
 use crate::domain::profession::Professions;
+use utoipa::{ToSchema};
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct ActorsDTO {
     pub uid: String,
     pub title: String,
@@ -20,7 +21,7 @@ pub struct ActorsDTO {
     pub profession: Option<ProfessionsDTO>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct ProfessionsDTO {
     pub name: String,
     pub family: String,
@@ -28,7 +29,13 @@ pub struct ProfessionsDTO {
 }
 
 impl ActorsDTO {
-    pub fn from_domain(actor: &Actors, profession: Option<&Professions>) -> ActorsDTO {
+    pub fn from_entities(actors: Vec<(&Actors, Option<&Professions>)>) -> Vec<ActorsDTO> {
+        actors.into_iter()
+            .map(|(a, p)| Self::from_entity(a, p))
+            .collect()
+    }
+
+    pub fn from_entity(actor: &Actors, profession: Option<&Professions>) -> ActorsDTO {
         let a = actor.clone();
         Self {
             uid: a.uid,

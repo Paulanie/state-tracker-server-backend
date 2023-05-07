@@ -1,19 +1,24 @@
 use std::collections::HashMap;
 use actix_web::{web, get};
 use actix_web::web::Json;
-use rbatis::sql::{Page, PageRequest};
-use crate::api::common::{build_result_page, DatabaseError, PaginationRequest};
+use rbatis::sql::{PageRequest};
+use crate::api::common::{ActorsPageResult, build_result_page, DatabaseError, PaginationRequest};
 use crate::AppState;
 use crate::domain::actor::Actors;
-use crate::api::dto::actors::ActorsDTO;
+use crate::api::dto::actors::{ActorsDTO};
 use crate::domain::profession::Professions;
 
-
+#[utoipa::path(
+    params(PaginationRequest),
+    responses(
+        (status = 200, description = "The actors found.", body = ActorsPageResult),
+    )
+)]
 #[get("/actors")]
 async fn list(
     state: web::Data<AppState>,
     page: web::Query<PaginationRequest>,
-) -> Result<Json<Page<ActorsDTO>>, DatabaseError> {
+) -> Result<Json<ActorsPageResult>, DatabaseError> {
     let mut db_pool = &state.pool.clone();
     let page_request = PageRequest::new(page.page, page.size);
     let ordering = page.ordering.clone().unwrap_or_else(|| "trigram".to_string());
@@ -28,7 +33,7 @@ async fn list(
             .map(|p| (p.id, p))
             .collect::<HashMap<_, _>>();
         let records = data.records.iter()
-            .map(|a| ActorsDTO::from_domain(a, professions.get(&a.profession_id)))
+            .map(|a| ActorsDTO::from_entity(a, professions.get(&a.profession_id)))
             .collect::<Vec<_>>();
         build_result_page(data.page_no, data.page_size, data.total, records)
     })?.await;
@@ -36,16 +41,31 @@ async fn list(
     Ok(Json(d))
 }
 
+#[utoipa::path(
+    params(
+        ("id", description = "The id of the actor")
+    ),
+    responses(
+        (status = 200, description = "The actor with the requested ID", body = ActorsDTO),
+        (status = 404, description = "Actor not found", body = ErrorResponse)
+    )
+)]
 #[get("/actors/{id}")]
 async fn get(
     state: web::Data<AppState>,
     path: web::Path<String>,
-) -> Result<Option<Json<Actors>>, DatabaseError> {
+) -> Result<Option<Json<ActorsDTO>>, DatabaseError> {
     let mut db = &state.pool.clone();
     let uid = path.into_inner();
-    let actors = Actors::select_by_uid(&mut db, uid).await;
+    let actor = Actors::select_by_uid(&mut db, uid).await?;
 
-    Ok(actors?.map(Json))
+    Ok(match actor {
+        None => None,
+        Some(a) => {
+            let profession = Professions::select_by_uid(&mut db, a.profession_id).await?;
+            Some(Json(ActorsDTO::from_entity(&a, profession.as_ref())))
+        }
+    })
 }
 
 pub fn config(cfg: &mut web::ServiceConfig) {
