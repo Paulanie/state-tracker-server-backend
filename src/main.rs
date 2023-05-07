@@ -17,6 +17,8 @@ use utoipa_swagger_ui::SwaggerUi;
 use crate::configuration::APPCONFIG;
 use crate::migration::migrate;
 
+use crate::api::{dto, common, amendments, actors};
+
 
 #[derive(Clone)]
 pub struct AppState {
@@ -26,18 +28,18 @@ pub struct AppState {
 #[derive(OpenApi)]
     #[openapi(
         paths(
-            api::amendments::list,
-            api::amendments::get,
-            api::actors::list,
-            api::actors::get
+            amendments::list,
+            amendments::get,
+            actors::list,
+            actors::get
         ),
         components(
-            schemas(api::dto::amendments::AmendmentsDTO),
-            schemas(api::dto::actors::ActorsDTO),
-            schemas(api::dto::actors::ProfessionsDTO),
-            schemas(api::common::SortOrder),
-            schemas(api::common::ActorsPageResult),
-            schemas(api::common::AmendmentsPageResult),
+            schemas(dto::amendments::AmendmentsDTO),
+            schemas(dto::actors::ActorsDTO),
+            schemas(dto::actors::ProfessionsDTO),
+            schemas(common::pagination::SortOrder),
+            schemas(common::pagination::ActorsPageResult),
+            schemas(common::pagination::AmendmentsPageResult)
         ),
         tags(
             (name = "todo", description = "Todo management endpoints.")

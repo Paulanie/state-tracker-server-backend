@@ -1,7 +1,8 @@
 use actix_web::{web, get};
 use actix_web::web::Json;
 use rbatis::sql::{PageRequest};
-use crate::api::common::{AmendmentsPageResult, build_result_page, DatabaseError, PageResult, PaginationRequest};
+use crate::api::common::error::DatabaseError;
+use crate::api::common::pagination::{AmendmentsPageResult, build_result_page, PaginationRequest};
 use crate::api::dto::amendments::AmendmentsDTO;
 use crate::AppState;
 use crate::domain::amendment::Amendments;
@@ -10,6 +11,7 @@ use crate::domain::amendment::Amendments;
     params(PaginationRequest),
     responses(
         (status = 200, description = "The amendments found.", body = AmendmentsPageResult),
+        (status = 500, description = "Internal server error.")
     )
 )]
 #[get("/amendments")]
@@ -38,7 +40,8 @@ pub async fn list(
     ),
     responses(
         (status = 200, description = "The amendment with the requested ID", body = AmendmentsDTO),
-        (status = 404, description = "Amendment not found", body = ErrorResponse)
+        (status = 404, description = "Amendment not found."),
+        (status = 500, description = "Internal server error.")
     )
 )]
 #[get("/amendments/{id}")]

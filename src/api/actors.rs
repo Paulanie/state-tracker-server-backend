@@ -2,7 +2,8 @@ use std::collections::HashMap;
 use actix_web::{web, get};
 use actix_web::web::Json;
 use rbatis::sql::{PageRequest};
-use crate::api::common::{ActorsPageResult, build_result_page, DatabaseError, PaginationRequest};
+use crate::api::common::error::DatabaseError;
+use crate::api::common::pagination::{ActorsPageResult, build_result_page, PaginationRequest};
 use crate::AppState;
 use crate::domain::actor::Actors;
 use crate::api::dto::actors::{ActorsDTO};
@@ -12,6 +13,7 @@ use crate::domain::profession::Professions;
     params(PaginationRequest),
     responses(
         (status = 200, description = "The actors found.", body = ActorsPageResult),
+        (status = 500, description = "Internal server error.")
     )
 )]
 #[get("/actors")]
@@ -47,7 +49,8 @@ async fn list(
     ),
     responses(
         (status = 200, description = "The actor with the requested ID", body = ActorsDTO),
-        (status = 404, description = "Actor not found", body = ErrorResponse)
+        (status = 404, description = "Actor not found"),
+        (status = 500, description = "Internal server error")
     )
 )]
 #[get("/actors/{id}")]
