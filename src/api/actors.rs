@@ -1,20 +1,22 @@
 use std::collections::HashMap;
 use actix_web::{web, get};
 use actix_web::web::Json;
+use itertools::Itertools;
 use rbatis::sql::{PageRequest};
 use crate::api::common::error::DatabaseError;
 use crate::api::common::pagination::{ActorsPageResult, build_result_page, PaginationRequest};
 use crate::AppState;
 use crate::domain::actor::Actors;
 use crate::api::dto::actors::{ActorsDTO};
+use crate::domain::actor_address::ActorsAddresses;
 use crate::domain::profession::Professions;
 
 #[utoipa::path(
-    params(PaginationRequest),
-    responses(
-        (status = 200, description = "The actors found.", body = ActorsPageResult),
-        (status = 500, description = "Internal server error.")
-    )
+params(PaginationRequest),
+responses(
+(status = 200, description = "The actors found.", body = ActorsPageResult),
+(status = 500, description = "Internal server error.")
+)
 )]
 #[get("/actors")]
 async fn list(
@@ -34,8 +36,22 @@ async fn list(
             .into_iter()
             .map(|p| (p.id, p))
             .collect::<HashMap<_, _>>();
+        let addresses = ActorsAddresses::select_by_actor_uids(&mut db_pool, data
+                .records
+                .iter()
+                .map(|d| format!("'{}'", d.uid))
+                .collect::<Vec<_>>()
+                .join(",")
+        )
+            .await
+            .unwrap()
+            .into_iter()
+            .group_by(|a| a.actor_uid.clone())
+            .into_iter()
+            .map(|(k, v)| (k, v.collect::<Vec<_>>()))
+            .collect::<HashMap<_, _>>();
         let records = data.records.iter()
-            .map(|a| ActorsDTO::from_entity(a, professions.get(&a.profession_id)))
+            .map(|a| ActorsDTO::from_entity(a, professions.get(&a.profession_id), addresses.get(&a.uid)))
             .collect::<Vec<_>>();
         build_result_page(data.page_no, data.page_size, data.total, records)
     })?.await;
@@ -44,14 +60,14 @@ async fn list(
 }
 
 #[utoipa::path(
-    params(
-        ("id", description = "The id of the actor")
-    ),
-    responses(
-        (status = 200, description = "The actor with the requested ID", body = ActorsDTO),
-        (status = 404, description = "Actor not found"),
-        (status = 500, description = "Internal server error")
-    )
+params(
+("id", description = "The id of the actor")
+),
+responses(
+(status = 200, description = "The actor with the requested ID", body = ActorsDTO),
+(status = 404, description = "Actor not found"),
+(status = 500, description = "Internal server error")
+)
 )]
 #[get("/actors/{id}")]
 async fn get(
@@ -66,7 +82,8 @@ async fn get(
         None => None,
         Some(a) => {
             let profession = Professions::select_by_uid(&mut db, a.profession_id).await?;
-            Some(Json(ActorsDTO::from_entity(&a, profession.as_ref())))
+            let addresses = ActorsAddresses::select_by_actor_uid(&mut db, a.uid.clone()).await?;
+            Some(Json(ActorsDTO::from_entity(&a, profession.as_ref(), Some(&addresses))))
         }
     })
 }

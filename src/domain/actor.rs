@@ -5,6 +5,7 @@ use rbatis::rbdc::datetime::DateTime;
 
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Actors {
     pub uid: String,
     pub title: String,
@@ -14,11 +15,8 @@ pub struct Actors {
     pub trigram: String,
     pub birthdate: Option<DateTime>,
     pub birthplace: Option<String>,
-    #[serde(rename = "deathDate")]
     pub death_date: Option<DateTime>,
-    #[serde(rename = "uriHatvp")]
     pub uri_hatvp: Option<String>,
-    #[serde(rename = "professionId")]
     pub profession_id: i32
 }
 

@@ -4,22 +4,16 @@ use crate::domain::amendment::Amendments;
 use utoipa::{ToSchema};
 
 #[derive(Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct AmendmentsDTO {
     pub uid: String,
-    #[serde(rename = "examinationRef")]
     pub examination_ref: String,
-    #[serde(rename = "triAmendment")]
     pub tri_amendment: String,
-    #[serde(rename = "legislativeTextRef")]
     pub legislative_text_ref: String,
-    #[serde(rename = "deliveryDate")]
     pub delivery_date: Option<DateTime>,
-    #[serde(rename = "publicationDate")]
     pub publication_date: Option<DateTime>,
-    #[serde(rename = "sortDate")]
     pub sort_date: Option<DateTime>,
     pub state: String,
-    #[serde(rename = "subState")]
     pub sub_state: Option<String>,
     pub representation: String,
     pub article99: bool,

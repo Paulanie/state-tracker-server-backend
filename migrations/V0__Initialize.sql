@@ -1,4 +1,4 @@
-CREATE TABLE Amendments
+CREATE TABLE amendments
 (
     [uid]                VARCHAR(256) PRIMARY KEY,
     [examinationRef]     VARCHAR(256),
@@ -13,10 +13,10 @@ CREATE TABLE Amendments
     [article99]          BIT
 );
 
-CREATE NONCLUSTERED INDEX ncix_amendments_deliveryDate ON Amendments (deliveryDate);
-CREATE NONCLUSTERED INDEX ncix_amendments_state ON Amendments (state);
+CREATE NONCLUSTERED INDEX ncix_amendments_deliveryDate ON amendments (deliveryDate);
+CREATE NONCLUSTERED INDEX ncix_amendments_state ON amendments (state);
 
-CREATE TABLE Organs
+CREATE TABLE organs
 (
     [uid]                VARCHAR(128) PRIMARY KEY,
     [type]               NVARCHAR(128),
@@ -27,7 +27,7 @@ CREATE TABLE Organs
     [viMoDeStartDate]    DATE          NULL,
     [viMoDeEndDate]      DATE          NULL,
     [viMoDeApprovalDate] DATE          NULL,
-    [parentOrganUid]     VARCHAR(128)  NULL FOREIGN KEY REFERENCES Organs (uid),
+    [parentOrganUid]     VARCHAR(128)  NULL FOREIGN KEY REFERENCES organs (uid),
     [chamber]            NVARCHAR(128) NULL,
     [regime]             NVARCHAR(128),
     [legislature]        INT,
@@ -38,12 +38,12 @@ CREATE TABLE Organs
     [departmentLabel]    NVARCHAR(64)  NULL
 );
 
-CREATE NONCLUSTERED INDEX ncix_organs_regionLabel ON Organs (regionLabel);
-CREATE NONCLUSTERED INDEX ncix_organs_departmentCode ON Organs (departmentCode);
-CREATE NONCLUSTERED INDEX ncix_organs_type ON Organs (type);
+CREATE NONCLUSTERED INDEX ncix_organs_regionLabel ON organs (regionLabel);
+CREATE NONCLUSTERED INDEX ncix_organs_departmentCode ON organs (departmentCode);
+CREATE NONCLUSTERED INDEX ncix_organs_type ON organs (type);
 
 
-CREATE TABLE Professions
+CREATE TABLE professions
 (
     [id]       INT IDENTITY (1,1) PRIMARY KEY,
     [name]     NVARCHAR(512) UNIQUE NULL,
@@ -51,10 +51,10 @@ CREATE TABLE Professions
     [category] NVARCHAR(512)
 );
 
-CREATE NONCLUSTERED INDEX ncix_professions_name ON Professions (name);
-CREATE NONCLUSTERED INDEX ncix_professions_family ON Professions (family);
+CREATE NONCLUSTERED INDEX ncix_professions_name ON professions (name);
+CREATE NONCLUSTERED INDEX ncix_professions_family ON professions (family);
 
-CREATE TABLE Actors
+CREATE TABLE actors
 (
     [uid]          VARCHAR(32) PRIMARY KEY,
     [title]        NVARCHAR(128),
@@ -66,13 +66,13 @@ CREATE TABLE Actors
     [birthplace]   NVARCHAR(512) NULL,
     [deathDate]    DATE          NULL,
     [uriHatvp]     NVARCHAR(512) NULL,
-    [professionId] INT FOREIGN KEY REFERENCES Professions (id),
+    [professionId] INT FOREIGN KEY REFERENCES professions (id),
 );
 
-CREATE TABLE ActorsAddresses
+CREATE TABLE actors_addresses
 (
     [uid]              VARCHAR(32) PRIMARY KEY,
-    [actorUid]         VARCHAR(32) FOREIGN KEY REFERENCES Actors (uid),
+    [actorUid]         VARCHAR(32) FOREIGN KEY REFERENCES actors (uid),
     [type]             INTEGER,
     [typeName]         NVARCHAR(128),
     [weight]           INTEGER      NULL,
@@ -85,12 +85,12 @@ CREATE TABLE ActorsAddresses
     [phone]            VARCHAR(32)  NULL
 );
 
-CREATE NONCLUSTERED INDEX ncix_actorsAddresses_type ON ActorsAddresses (type);
+CREATE NONCLUSTERED INDEX ncix_actorsAddresses_type ON actors_addresses (type);
 
-CREATE TABLE Mandates
+CREATE TABLE mandates
 (
     [uid]                  VARCHAR(32) PRIMARY KEY,
-    [actorUid]             VARCHAR(32) FOREIGN KEY REFERENCES Actors (uid),
+    [actorUid]             VARCHAR(32) FOREIGN KEY REFERENCES actors (uid),
     [termOfOffice]         VARCHAR(4) NULL,
     [organType]            VARCHAR(16),
     [startDate]            DATE,
@@ -102,10 +102,10 @@ CREATE TABLE Mandates
     [organUid]             VARCHAR(32)
 );
 
-CREATE TABLE ParliamentaryMandates
+CREATE TABLE parliamentary_mandates
 (
     [uid]                      VARCHAR(32) PRIMARY KEY,
-    [actorUid]                 VARCHAR(32) FOREIGN KEY REFERENCES Actors (uid),
+    [actorUid]                 VARCHAR(32) FOREIGN KEY REFERENCES actors (uid),
     [termOfOffice]             VARCHAR(4)                                                     NULL,
     [organType]                VARCHAR(16),
     [startDate]                DATE,
@@ -127,13 +127,13 @@ CREATE TABLE ParliamentaryMandates
     [endReason]                VARCHAR(128)                                                   NULL,
     [firstElection]            INTEGER,
     [assemblyPlace]            INTEGER,
-    [replacingMandateUid]      VARCHAR(32) FOREIGN KEY REFERENCES ParliamentaryMandates (uid) NULL
+    [replacingMandateUid]      VARCHAR(32) FOREIGN KEY REFERENCES parliamentary_mandates (uid) NULL
 );
 
-CREATE TABLE ParliamentaryMandateCollaborators
+CREATE TABLE parliamentary_mandate_collaborators
 (
     [id]         INT IDENTITY (1,1) PRIMARY KEY,
-    [mandateUid] VARCHAR(32) FOREIGN KEY REFERENCES ParliamentaryMandates (uid),
+    [mandateUid] VARCHAR(32) FOREIGN KEY REFERENCES parliamentary_mandates (uid),
     [title]      NVARCHAR(32),
     [surname]    NVARCHAR(256),
     [name]       NVARCHAR(256),

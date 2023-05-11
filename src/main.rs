@@ -1,6 +1,7 @@
 #[macro_use]
 extern crate rbatis;
 extern crate rbdc_mssql;
+extern crate itertools;
 
 mod configuration;
 mod domain;
@@ -36,7 +37,9 @@ pub struct AppState {
         components(
             schemas(dto::amendments::AmendmentsDTO),
             schemas(dto::actors::ActorsDTO),
-            schemas(dto::actors::ProfessionsDTO),
+            schemas(dto::professions::ProfessionsDTO),
+            schemas(dto::actors_addresses::ActorsAddressesDTO),
+            schemas(dto::actors_addresses::AddressDTO),
             schemas(common::pagination::SortOrder),
             schemas(common::pagination::ActorsPageResult),
             schemas(common::pagination::AmendmentsPageResult)
