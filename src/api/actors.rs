@@ -12,11 +12,11 @@ use crate::domain::actor_address::ActorsAddresses;
 use crate::domain::profession::Professions;
 
 #[utoipa::path(
-params(PaginationRequest),
-responses(
-(status = 200, description = "The actors found.", body = ActorsPageResult),
-(status = 500, description = "Internal server error.")
-)
+    params(PaginationRequest),
+    responses(
+        (status = 200, description = "The actors found.", body = ActorsPageResult),
+        (status = 500, description = "Internal server error.")
+    )
 )]
 #[get("/actors")]
 async fn list(
@@ -53,21 +53,22 @@ async fn list(
         let records = data.records.iter()
             .map(|a| ActorsDTO::from_entity(a, professions.get(&a.profession_id), addresses.get(&a.uid)))
             .collect::<Vec<_>>();
-        build_result_page(data.page_no, data.page_size, data.total, records)
+        let r = build_result_page(data.page_no, data.page_size, data.total, records);
+        r
     })?.await;
 
     Ok(Json(d))
 }
 
 #[utoipa::path(
-params(
-("id", description = "The id of the actor")
-),
-responses(
-(status = 200, description = "The actor with the requested ID", body = ActorsDTO),
-(status = 404, description = "Actor not found"),
-(status = 500, description = "Internal server error")
-)
+    params(
+        ("id", description = "The id of the actor")
+    ),
+    responses(
+        (status = 200, description = "The actor with the requested ID", body = ActorsDTO),
+        (status = 404, description = "Actor not found"),
+        (status = 500, description = "Internal server error")
+    )
 )]
 #[get("/actors/{id}")]
 async fn get(

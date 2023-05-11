@@ -4,7 +4,7 @@ use utoipa::{ToSchema};
 
 #[derive(Serialize, ToSchema)]
 pub struct ProfessionsDTO {
-    pub name: String,
+    pub name: Option<String>,
     pub family: String,
     pub category: String,
 }

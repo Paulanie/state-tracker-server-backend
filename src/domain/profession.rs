@@ -6,7 +6,7 @@ use serde_derive::Deserialize;
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Professions {
     pub id: i32,
-    pub name: String,
+    pub name: Option<String>,
     pub family: String,
     pub category: String
 }
