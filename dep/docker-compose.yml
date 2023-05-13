@@ -14,5 +14,10 @@ services:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=Statetracker123
 
+  backend:
+    image: statetracker
+    ports:
+      - "8081:8080"
+
 volumes:
   mssql_data:

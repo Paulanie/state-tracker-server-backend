@@ -29,10 +29,10 @@ pub struct AppState {
 #[derive(OpenApi)]
     #[openapi(
         paths(
-            amendments::list,
-            amendments::get,
-            actors::list,
-            actors::get
+            amendments::list_amendments,
+            amendments::get_amendment,
+            actors::list_actors,
+            actors::get_actor
         ),
         components(
             schemas(dto::amendments::AmendmentsDTO),
@@ -55,7 +55,7 @@ struct ApiDoc;
 async fn main() -> std::io::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
 
-    info!("
+    println!("
    _____ _        _         _______             _
   / ____| |      | |       |__   __|           | |
  | (___ | |_ __ _| |_ ___     | |_ __ __ _  ___| | _____ _ __
@@ -102,7 +102,7 @@ async fn main() -> std::io::Result<()> {
             )
             .wrap(Logger::default())
     })
-        .bind(("127.0.0.1", 8080))?
+        .bind(("0.0.0.0", 8080))?
         .run()
         .await
 }

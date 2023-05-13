@@ -15,7 +15,7 @@ use crate::domain::amendment::Amendments;
     )
 )]
 #[get("/amendments")]
-pub async fn list(
+pub async fn list_amendments(
     state: web::Data<AppState>,
     page: web::Query<PaginationRequest>,
 ) -> Result<Json<AmendmentsPageResult>, DatabaseError> {
@@ -45,7 +45,7 @@ pub async fn list(
     )
 )]
 #[get("/amendments/{id}")]
-pub async fn get(
+pub async fn get_amendment(
     state: web::Data<AppState>,
     path: web::Path<String>,
 ) -> Result<Option<Json<AmendmentsDTO>>, DatabaseError> {
@@ -57,6 +57,6 @@ pub async fn get(
 }
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(list)
-        .service(get);
+    cfg.service(list_amendments)
+        .service(get_amendment);
 }

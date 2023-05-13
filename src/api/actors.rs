@@ -19,7 +19,7 @@ use crate::domain::profession::Professions;
     )
 )]
 #[get("/actors")]
-async fn list(
+async fn list_actors(
     state: web::Data<AppState>,
     page: web::Query<PaginationRequest>,
 ) -> Result<Json<ActorsPageResult>, DatabaseError> {
@@ -71,7 +71,7 @@ async fn list(
     )
 )]
 #[get("/actors/{id}")]
-async fn get(
+async fn get_actor(
     state: web::Data<AppState>,
     path: web::Path<String>,
 ) -> Result<Option<Json<ActorsDTO>>, DatabaseError> {
@@ -90,6 +90,6 @@ async fn get(
 }
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(list)
-        .service(get);
+    cfg.service(list_actors)
+        .service(get_actor);
 }
