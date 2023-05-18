@@ -23,7 +23,7 @@ pub async fn list_amendments(
     let amendments = Amendments::select_all_paginated(
         &mut db,
         &PageRequest::new(page.page, page.size),
-        page.ordering.clone().unwrap_or(String::from("deliveryDate")).as_str(),
+        page.ordering.clone().unwrap_or(String::from("delivery_date")).as_str(),
         page.sort_order.clone().as_str(),
     )
         .await;

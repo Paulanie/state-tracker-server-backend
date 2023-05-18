@@ -32,5 +32,5 @@ impl_select_page!(Amendments{select_all_paginated(order_by: &str, sort_order: &s
 #[cfg(feature = "postgres")]
 impl_select_page!(Amendments{select_all_paginated(order_by: &str, sort_order: &str) => "
     if !sql.contains('count'):
-        `order by ${order_by} ${sort_order}, uid limit ${page_no} offset ${page_size} * ${page_no} --`"});
+        `order by ${order_by} ${sort_order}, uid limit ${page_size} offset ${page_size} * ${page_no} --`"});
 impl_select!(Amendments{select_by_uid(uid:String) -> Option => "`where uid = #{uid}`"});

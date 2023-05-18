@@ -29,5 +29,5 @@ impl fmt::Display for ActorsAddresses {
 
 crud!(ActorsAddresses{});
 impl_select!(ActorsAddresses{select_by_uid(uid:String) -> Option => "`where uid = #{uid}`"});
-impl_select!(ActorsAddresses{select_by_actor_uid(uid:String) => "`where actorUid = #{uid}`"});
-impl_select!(ActorsAddresses{select_by_actor_uids(uids:String) => "`where actorUid in (${uids})`"});
+impl_select!(ActorsAddresses{select_by_actor_uid(uid:String) => "`where actor_uid = #{uid}`"});
+impl_select!(ActorsAddresses{select_by_actor_uids(uids:String) => "`where actor_uid in (${uids})`"});

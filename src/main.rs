@@ -110,8 +110,8 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(app_state.clone()))
-            .configure(api::amendments::config)
-            .configure(api::actors::config)
+            .configure(amendments::config)
+            .configure(actors::config)
             .service(
                 SwaggerUi::new("/swagger-ui/{_:.*}").url("/api-docs/openapi.json", openapi.clone()),
             )

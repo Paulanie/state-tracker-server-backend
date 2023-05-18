@@ -5,7 +5,6 @@ use rbatis::rbdc::datetime::DateTime;
 
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct Actors {
     pub uid: String,
     pub title: String,
