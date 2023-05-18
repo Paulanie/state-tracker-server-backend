@@ -25,12 +25,23 @@ lazy_static!(
 );
 
 impl MainConfig {
-    pub fn db_connection_string(&self) -> String {
+    #[cfg(feature = "mssql")]
+    pub fn connection_string(&self) -> String {
         format!("jdbc:sqlserver://{}:{};user={};password={};databaseName={};trustServerCertificate=true",
                 self.db_host,
                 self.db_port,
                 self.db_user,
                 self.db_pass,
                 self.db_name)
+    }
+
+    #[cfg(feature = "postgres")]
+    pub fn connection_string(&self) -> String {
+    format!("postgres://{}:{}@{}:{}/{}",
+            self.db_user,
+            self.db_pass,
+            self.db_host,
+            self.db_port,
+            self.db_name)
     }
 }

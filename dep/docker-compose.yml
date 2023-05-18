@@ -15,7 +15,7 @@ services:
       - MSSQL_SA_PASSWORD=Statetracker123
 
   backend:
-    image: statetracker
+    image: pravez/statetracker:latest
     ports:
       - "8081:8080"
 

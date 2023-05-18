@@ -1,6 +1,15 @@
+#[cfg(all(feature = "postgres", feature = "mssql"))]
+compile_error!("PostgreSQL and MSSQL features cannot be enabled at the same time, choose one.");
+
+#[cfg(all(not(feature = "postgres"), not(feature = "mssql")))]
+compile_error!("At least one of PostgreSQL or MSSQL must be enabled.");
+
 #[macro_use]
 extern crate rbatis;
+#[cfg(feature = "mssql")]
 extern crate rbdc_mssql;
+#[cfg(feature = "postgres")]
+extern crate rbdc_pg;
 extern crate itertools;
 
 mod configuration;
@@ -11,7 +20,10 @@ mod api;
 use std::process::exit;
 use actix_web::{App, HttpServer, web, middleware::Logger};
 use rbatis::{Rbatis};
+#[cfg(feature = "mssql")]
 use rbdc_mssql::driver::MssqlDriver;
+#[cfg(feature = "postgres")]
+use rbdc_pg::driver::PgDriver;
 use log::{error, info};
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
@@ -75,7 +87,10 @@ async fn main() -> std::io::Result<()> {
     }
 
     let rb = Rbatis::new();
-    rb.init(MssqlDriver {}, APPCONFIG.main.db_connection_string().to_owned().as_str()).unwrap();
+    #[cfg(feature = "mssql")]
+    rb.init(MssqlDriver {}, APPCONFIG.main.connection_string().to_owned().as_str()).unwrap();
+    #[cfg(feature = "postgres")]
+    rb.init(PgDriver {}, APPCONFIG.main.connection_string().to_owned().as_str()).unwrap();
     match rb.exec("SELECT CURRENT_USER", vec!()).await {
         Ok(_) => { info!("Connection to database successful") }
         Err(error) => {

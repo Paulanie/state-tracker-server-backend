@@ -27,7 +27,12 @@ impl fmt::Display for Actors {
 }
 
 crud!(Actors{});
+#[cfg(feature = "mssql")]
 impl_select_page!(Actors{select_all_paginated(order_by: &str, sort_order: &str) => "
     if !sql.contains('count'):
         `order by ${order_by} ${sort_order}, uid offset ${page_size} * ${page_no} rows fetch next ${page_size} rows only --`"});
+#[cfg(feature = "postgres")]
+impl_select_page!(Actors{select_all_paginated(order_by: &str, sort_order: &str) => "
+    if !sql.contains('count'):
+        `order by ${order_by} ${sort_order}, uid limit ${page_no} offset ${page_size} * ${page_no} --`"});
 impl_select!(Actors{select_by_uid(uid:String) -> Option => "`where uid = #{uid}`"});
