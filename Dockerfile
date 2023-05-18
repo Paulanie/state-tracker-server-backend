@@ -9,13 +9,13 @@ WORKDIR /state-tracker-backend
 COPY ./Cargo.lock ./Cargo.lock
 COPY ./Cargo.toml ./Cargo.toml
 
-RUN cargo build --release
+RUN cargo build --release --features postgres
 RUN rm src/*.rs
 
 COPY ./src ./src
 COPY ./migrations ./migrations
 
-RUN cargo build --release
+RUN cargo build --release --features postgres
 
 FROM debian:bookworm-slim
 
