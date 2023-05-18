@@ -13,8 +13,8 @@ extern crate rbdc_pg;
 extern crate itertools;
 
 mod configuration;
-mod domain;
 mod migration;
+mod domain;
 mod api;
 
 use std::process::exit;

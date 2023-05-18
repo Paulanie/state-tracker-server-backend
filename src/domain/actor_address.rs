@@ -4,13 +4,12 @@ use serde_derive::Deserialize;
 
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct ActorsAddresses {
     pub uid: String,
     pub actor_uid: String,
     #[serde(rename = "type")]
     pub address_type: i32,
-    #[serde(rename = "typeName")]
+    #[serde(rename = "type_name")]
     pub address_type_name: String,
     pub weight: Option<i32>,
     pub affiliate_address: Option<String>,

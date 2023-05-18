@@ -4,7 +4,6 @@ use serde_derive::Deserialize;
 use std::fmt;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct Amendments {
     pub uid: String,
     pub examination_ref: String,

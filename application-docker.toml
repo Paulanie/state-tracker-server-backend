@@ -1,5 +1,4 @@
 [main]
-db_type = "Mssql"
 db_host = "mssql"
 db_port = "1433"
 db_user = "sa"

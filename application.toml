@@ -1,6 +1,6 @@
 [main]
 db_host = "localhost"
 db_port = "5432"
-db_user = "statetracker"
-db_pass = "statetracker"
+db_user = "sa"
+db_pass = "Statetracker123"
 db_name = "StateTracker"

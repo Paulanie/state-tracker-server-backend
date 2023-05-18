@@ -9,7 +9,6 @@ pub struct ApplicationConfig {
 
 #[derive(Deserialize)]
 pub struct MainConfig {
-    pub db_type: String,
     pub db_host: String,
     pub db_port: String,
     pub db_user: String,

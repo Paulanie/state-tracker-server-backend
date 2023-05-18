@@ -14,6 +14,15 @@ services:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=Statetracker123
 
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: sa
+      POSTGRES_PASSWORD: Statetracker123
+    ports:
+      - "5432:5432"
+
   backend:
     image: pravez/statetracker:latest
     ports:

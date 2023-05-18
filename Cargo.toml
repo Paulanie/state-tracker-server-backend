@@ -8,7 +8,7 @@ edition = "2021"
 # path = "src/main.rs"
 
 [features]
-postgres = ["rbdc-pg"]
+postgres = ["rbdc-pg", "refinery/tokio-postgres"]
 mssql = ["rbdc-mssql", "refinery/tiberius-config", "tiberius"]
 
 
