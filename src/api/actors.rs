@@ -12,11 +12,11 @@ use crate::domain::actor_address::ActorsAddresses;
 use crate::domain::profession::Professions;
 
 #[utoipa::path(
-    params(PaginationRequest),
-    responses(
-        (status = 200, description = "The actors found.", body = ActorsPageResult),
-        (status = 500, description = "Internal server error.")
-    )
+params(PaginationRequest),
+responses(
+(status = 200, description = "The actors found.", body = ActorsPageResult),
+(status = 500, description = "Internal server error.")
+)
 )]
 #[get("/actors")]
 async fn list_actors(
@@ -30,6 +30,9 @@ async fn list_actors(
     let actors = Actors::select_all_paginated(&mut db_pool, &page_request, &ordering, sort_order).await;
 
     let d = actors.map(|data| async move {
+        if data.total <= 0 {
+            return build_result_page(data.page_no, data.page_size, data.total, vec![]);
+        }
         let profession_ids = data.records.iter().map(|a| a.profession_id.to_string()).collect::<Vec<_>>().join(",");
         let professions = Professions::select_by_uids(&mut db_pool, profession_ids).await
             .unwrap()
@@ -37,11 +40,11 @@ async fn list_actors(
             .map(|p| (p.id, p))
             .collect::<HashMap<_, _>>();
         let addresses = ActorsAddresses::select_by_actor_uids(&mut db_pool, data
-                .records
-                .iter()
-                .map(|d| format!("'{}'", d.uid))
-                .collect::<Vec<_>>()
-                .join(",")
+            .records
+            .iter()
+            .map(|d| format!("'{}'", d.uid))
+            .collect::<Vec<_>>()
+            .join(","),
         )
             .await
             .unwrap()
@@ -61,14 +64,14 @@ async fn list_actors(
 }
 
 #[utoipa::path(
-    params(
-        ("id", description = "The id of the actor")
-    ),
-    responses(
-        (status = 200, description = "The actor with the requested ID", body = ActorsDTO),
-        (status = 404, description = "Actor not found"),
-        (status = 500, description = "Internal server error")
-    )
+params(
+("id", description = "The id of the actor")
+),
+responses(
+(status = 200, description = "The actor with the requested ID", body = ActorsDTO),
+(status = 404, description = "Actor not found"),
+(status = 500, description = "Internal server error")
+)
 )]
 #[get("/actors/{id}")]
 async fn get_actor(

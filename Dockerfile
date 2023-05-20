@@ -8,10 +8,6 @@ WORKDIR /state-tracker-backend
 
 COPY ./Cargo.lock ./Cargo.lock
 COPY ./Cargo.toml ./Cargo.toml
-
-RUN cargo build --release --features postgres
-RUN rm src/*.rs
-
 COPY ./src ./src
 COPY ./migrations ./migrations
 
@@ -26,7 +22,6 @@ RUN apt install -y libssl-dev
 
 WORKDIR /usr/src/
 COPY --from=build /state-tracker-backend/target/release/state-tracker-backend ./state-tracker-backend
-COPY ./application-docker.toml ./application.toml
 
 ENV RUST_LOG="info,rbatis=warn"
 # Run the binary

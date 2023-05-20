@@ -1,2 +1,1 @@
-CREATE DATABASE state-tracker;
-GO
+CREATE DATABASE "StateTracker";

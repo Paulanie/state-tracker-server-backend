@@ -1,6 +1,6 @@
 [main]
-db_host = "mssql"
-db_port = "1433"
+db_host = "postgres"
+db_port = "5432"
 db_user = "sa"
 db_pass = "Statetracker123"
 db_name = "StateTracker"
