@@ -1,19 +1,26 @@
+use std::fmt::{Display, Formatter};
 use std::fs;
 use lazy_static::lazy_static;
-use serde_derive::Deserialize;
+use serde_derive::{Deserialize, Serialize};
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 pub struct ApplicationConfig {
     pub main: MainConfig,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 pub struct MainConfig {
     pub db_host: String,
     pub db_port: String,
     pub db_user: String,
     pub db_pass: String,
     pub db_name: String,
+}
+
+impl Display for ApplicationConfig {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", serde_json::to_string_pretty(self).unwrap())
+    }
 }
 
 lazy_static!(

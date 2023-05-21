@@ -76,7 +76,7 @@ async fn main() -> std::io::Result<()> {
  |_____/ \\__\\__,_|\\__\\___|    |_|_|  \\__,_|\\___|_|\\_\\___|_|
 
                                                               ");
-    info!("Starting State Tracker Server");
+    info!("Starting State Tracker Server with the following configuration : \n {}", APPCONFIG.to_string());
     info!("Applying SQL Migrations ...");
     match migrate().await {
         Ok(_) => { info!("Migration successful") }
