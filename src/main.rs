@@ -18,7 +18,8 @@ mod domain;
 mod api;
 
 use std::process::exit;
-use actix_web::{App, HttpServer, web, middleware::Logger};
+use actix_cors::Cors;
+use actix_web::{App, HttpServer, web, middleware::Logger, http};
 use rbatis::{Rbatis};
 #[cfg(feature = "mssql")]
 use rbdc_mssql::driver::MssqlDriver;
@@ -108,7 +109,14 @@ async fn main() -> std::io::Result<()> {
     info!("Starting Actix-Web Server");
     info!("Swagger UI can be found on : http://127.0.0.1:8080/swagger-ui/");
     HttpServer::new(move || {
+        let cors = Cors::default()
+              .allowed_methods(vec!["GET", "POST"])
+              .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
+              .allowed_header(http::header::CONTENT_TYPE)
+              .max_age(3600);
+
         App::new()
+            .wrap(cors)
             .app_data(web::Data::new(app_state.clone()))
             .configure(amendments::config)
             .configure(actors::config)
