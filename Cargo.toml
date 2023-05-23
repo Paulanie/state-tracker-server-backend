@@ -13,6 +13,7 @@ mssql = ["rbdc-mssql", "refinery/tiberius-config", "tiberius"]
 
 
 [dependencies]
+actix-cors = "0.6.4"
 actix-web = "4"
 env_logger = "0.10.0"
 futures = "0.3.28"
