@@ -11,8 +11,8 @@ CREATE TABLE amendments
     sub_state                  VARCHAR(64),
     representation             VARCHAR(256),
     article99                  BOOLEAN,
-    content_summary            TEXT,
-    content_title              TEXT,
+    content_summary            TEXT DEFAULT NULL,
+    content_title              TEXT DEFAULT NULL,
     author_type                VARCHAR(256),
     author_uid                 VARCHAR(32) REFERENCES actors (uid),
     author_political_group_uid VARCHAR(32)
