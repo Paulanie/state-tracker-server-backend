@@ -16,6 +16,8 @@ pub struct Amendments {
     pub sub_state: Option<String>,
     pub representation: String,
     pub article99: bool,
+    pub content_summary: String,
+    pub content_title: String,
 }
 
 impl fmt::Display for Amendments {

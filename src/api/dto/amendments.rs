@@ -17,6 +17,8 @@ pub struct AmendmentsDTO {
     pub sub_state: Option<String>,
     pub representation: String,
     pub article99: bool,
+    pub content_summary: String,
+    pub content_title: String,
 }
 
 impl AmendmentsDTO {
@@ -40,6 +42,8 @@ impl AmendmentsDTO {
             sub_state: a.sub_state,
             representation: a.representation,
             article99: a.article99,
+            content_title: a.content_title,
+            content_summary: a.content_summary,
         }
     }
 }
