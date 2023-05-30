@@ -1,16 +1,21 @@
 CREATE TABLE amendments
 (
-    uid                  VARCHAR(256) PRIMARY KEY,
-    examination_ref      VARCHAR(256),
-    tri_amendment        VARCHAR(512),
-    legislative_text_ref VARCHAR(256),
-    delivery_date        DATE,
-    publication_date     DATE,
-    sort_date            DATE DEFAULT NULL,
-    state                VARCHAR(64),
-    sub_state            VARCHAR(64),
-    representation       VARCHAR(256),
-    article99            BOOLEAN
+    uid                        VARCHAR(256) PRIMARY KEY,
+    examination_ref            VARCHAR(256),
+    tri_amendment              VARCHAR(512),
+    legislative_text_ref       VARCHAR(256),
+    delivery_date              DATE,
+    publication_date           DATE,
+    sort_date                  DATE DEFAULT NULL,
+    state                      VARCHAR(64),
+    sub_state                  VARCHAR(64),
+    representation             VARCHAR(256),
+    article99                  BOOLEAN,
+    content_summary            TEXT,
+    content_title              TEXT,
+    author_type                VARCHAR(256),
+    author_uid                 VARCHAR(32) REFERENCES actors (uid),
+    author_political_group_uid VARCHAR(32)
 );
 
 CREATE INDEX ix_amendments_deliveryDate ON amendments (delivery_date);

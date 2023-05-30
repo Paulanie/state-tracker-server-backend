@@ -18,6 +18,9 @@ pub struct Amendments {
     pub article99: bool,
     pub content_summary: String,
     pub content_title: String,
+    pub author_type: String,
+    pub author_uid: String,
+    pub author_political_group_uid: String,
 }
 
 impl fmt::Display for Amendments {

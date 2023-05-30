@@ -19,6 +19,9 @@ pub struct AmendmentsDTO {
     pub article99: bool,
     pub content_summary: String,
     pub content_title: String,
+    pub author_type: String,
+    pub author_uid: String,
+    pub author_political_group_uid: String,
 }
 
 impl AmendmentsDTO {
@@ -44,6 +47,9 @@ impl AmendmentsDTO {
             article99: a.article99,
             content_title: a.content_title,
             content_summary: a.content_summary,
+            author_type: a.author_type,
+            author_uid: a.author_uid,
+            author_political_group_uid: a.author_political_group_uid,
         }
     }
 }
