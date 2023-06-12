@@ -1,22 +1,24 @@
 use std::fmt;
-use serde_derive::Serialize;
-use serde_derive::Deserialize;
-use rbatis::rbdc::datetime::DateTime;
+
+use diesel::prelude::*;
+use diesel::sql_types::Date;
 
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Queryable, Selectable)]
+#[diesel(table_name = crate::domain::schema::actors)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Actors {
     pub uid: String,
     pub title: String,
     pub surname: String,
     pub name: String,
     pub alpha: String,
-    pub trigram: String,
-    pub birthdate: Option<DateTime>,
+    pub trigram: Option<String>,
+    pub birthdate: Option<Date>,
     pub birthplace: Option<String>,
-    pub death_date: Option<DateTime>,
+    pub death_date: Option<Date>,
     pub uri_hatvp: Option<String>,
-    pub profession_id: i32
+    pub profession_id: Option<i32>,
 }
 
 impl fmt::Display for Actors {
@@ -25,13 +27,3 @@ impl fmt::Display for Actors {
     }
 }
 
-crud!(Actors{});
-#[cfg(feature = "mssql")]
-impl_select_page!(Actors{select_all_paginated(order_by: &str, sort_order: &str) => "
-    if !sql.contains('count'):
-        `order by ${order_by} ${sort_order}, uid offset ${page_size} * ${page_no} rows fetch next ${page_size} rows only --`"});
-#[cfg(feature = "postgres")]
-impl_select_page!(Actors{select_all_paginated(order_by: &str, sort_order: &str) => "
-    if !sql.contains('count'):
-        `order by ${order_by} ${sort_order}, uid limit ${page_no} offset ${page_size} * ${page_no} --`"});
-impl_select!(Actors{select_by_uid(uid:String) -> Option => "`where uid = #{uid}`"});

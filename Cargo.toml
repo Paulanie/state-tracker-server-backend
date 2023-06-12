@@ -7,29 +7,21 @@ edition = "2021"
 # name = "statetracker"
 # path = "src/main.rs"
 
-[features]
-postgres = ["rbdc-pg", "refinery/tokio-postgres"]
-mssql = ["rbdc-mssql", "refinery/tiberius-config", "tiberius"]
-
 
 [dependencies]
 actix-cors = "0.6.4"
 actix-web = "4"
+diesel = { version = "2.1.0", features = ["postgres", "r2d2"] }
 env_logger = "0.10.0"
 futures = "0.3.28"
 itertools = "0.10.5"
 lazy_static = "1.4.0"
 log = "0.4.17"
 measure_time = "0.8.2"
-rbatis = "4.3.0"
-rbdc-mssql = { version = "4.3.1", optional = true }
-rbdc-pg = { version = "4.3.4", optional = true }
-rbs = "4.3.2"
-refinery = { version = "0.8.9", features = ["tiberius-config"] }
+r2d2 = "0.8.10"
 serde = { version = "1.0.160", features = ["derive"] }
 serde_derive = "1.0.160"
 serde_json = "1.0.96"
-tiberius = { version = "0.12.2", features = ["tokio", "tokio-util"], optional = true }
 tokio = "1.28.0"
 tokio-util = "0.7.8"
 toml = "0.7.3"

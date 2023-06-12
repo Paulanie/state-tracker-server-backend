@@ -1,15 +1,3 @@
-#[cfg(all(feature = "postgres", feature = "mssql"))]
-compile_error!("PostgreSQL and MSSQL features cannot be enabled at the same time, choose one.");
-
-#[cfg(all(not(feature = "postgres"), not(feature = "mssql")))]
-compile_error!("At least one of PostgreSQL or MSSQL must be enabled.");
-
-#[macro_use]
-extern crate rbatis;
-#[cfg(feature = "mssql")]
-extern crate rbdc_mssql;
-#[cfg(feature = "postgres")]
-extern crate rbdc_pg;
 extern crate itertools;
 
 mod configuration;
@@ -20,47 +8,47 @@ mod api;
 use std::process::exit;
 use actix_cors::Cors;
 use actix_web::{App, HttpServer, web, middleware::Logger, http};
-use rbatis::{Rbatis};
-#[cfg(feature = "mssql")]
-use rbdc_mssql::driver::MssqlDriver;
-#[cfg(feature = "postgres")]
-use rbdc_pg::driver::PgDriver;
 use log::{error, info};
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 use crate::configuration::APPCONFIG;
 use crate::migration::migrate;
+use diesel::prelude::*;
+use diesel::r2d2::ConnectionManager;
+use diesel::r2d2::Pool;
+use diesel::pg::PgConnection;
 
 use crate::api::{dto, common, amendments, actors};
 
+type DbPool = Pool<ConnectionManager<PgConnection>>;
 
 #[derive(Clone)]
 pub struct AppState {
-    pool: Rbatis,
+    pool: DbPool,
 }
 
 #[derive(OpenApi)]
-    #[openapi(
-        paths(
-            amendments::list_amendments,
-            amendments::get_amendment,
-            actors::list_actors,
-            actors::get_actor
-        ),
-        components(
-            schemas(dto::amendments::AmendmentsDTO),
-            schemas(dto::actors::ActorsDTO),
-            schemas(dto::professions::ProfessionsDTO),
-            schemas(dto::actors_addresses::ActorsAddressesDTO),
-            schemas(dto::actors_addresses::AddressDTO),
-            schemas(common::pagination::SortOrder),
-            schemas(common::pagination::ActorsPageResult),
-            schemas(common::pagination::AmendmentsPageResult)
-        ),
-        tags(
-            (name = "todo", description = "Todo management endpoints.")
-        ),
-    )]
+#[openapi(
+paths(
+amendments::list_amendments,
+amendments::get_amendment,
+actors::list_actors,
+actors::get_actor
+),
+components(
+schemas(dto::amendments::AmendmentsDTO),
+schemas(dto::actors::ActorsDTO),
+schemas(dto::professions::ProfessionsDTO),
+schemas(dto::actors_addresses::ActorsAddressesDTO),
+schemas(dto::actors_addresses::AddressDTO),
+schemas(common::pagination::SortOrder),
+schemas(common::pagination::ActorsPageResult),
+schemas(common::pagination::AmendmentsPageResult)
+),
+tags(
+(name = "todo", description = "Todo management endpoints.")
+),
+)]
 struct ApiDoc;
 
 
@@ -87,21 +75,11 @@ async fn main() -> std::io::Result<()> {
         }
     }
 
-    let rb = Rbatis::new();
-    #[cfg(feature = "mssql")]
-    rb.init(MssqlDriver {}, APPCONFIG.main.connection_string().to_owned().as_str()).unwrap();
-    #[cfg(feature = "postgres")]
-    rb.init(PgDriver {}, APPCONFIG.main.connection_string().to_owned().as_str()).unwrap();
-    match rb.exec("SELECT CURRENT_USER", vec!()).await {
-        Ok(_) => { info!("Connection to database successful") }
-        Err(error) => {
-            error!("Unable to query database, error : {}", error.to_string());
-            exit(1)
-        }
-    }
+    let cm = ConnectionManager::<PgConnection>::new(APPCONFIG.main.connection_string());
+    let pool = Pool::builder().build(cm).unwrap();
 
     let app_state = AppState {
-        pool: rb,
+        pool,
     };
 
     let openapi = ApiDoc::openapi();
@@ -110,10 +88,10 @@ async fn main() -> std::io::Result<()> {
     info!("Swagger UI can be found on : http://127.0.0.1:8080/swagger-ui/");
     HttpServer::new(move || {
         let cors = Cors::default()
-              .allowed_methods(vec!["GET", "POST"])
-              .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
-              .allowed_header(http::header::CONTENT_TYPE)
-              .max_age(3600);
+            .allowed_methods(vec!["GET", "POST"])
+            .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
+            .allowed_header(http::header::CONTENT_TYPE)
+            .max_age(3600);
 
         App::new()
             .wrap(cors)

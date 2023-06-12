@@ -1,22 +1,23 @@
 use std::fmt;
-use serde_derive::Serialize;
-use serde_derive::Deserialize;
+
+use diesel::prelude::*;
 
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+
+#[derive(Queryable, Selectable)]
+#[diesel(table_name = crate::domain::schema::actors_addresses)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct ActorsAddresses {
     pub uid: String,
     pub actor_uid: String,
-    #[serde(rename = "type")]
     pub address_type: i32,
-    #[serde(rename = "type_name")]
     pub address_type_name: String,
     pub weight: Option<i32>,
     pub affiliate_address: Option<String>,
-    pub street_number: Option<String>,
-    pub street_name: Option<String>,
-    pub zip_code: Option<String>,
-    pub city: Option<String>,
+    pub street_number: String,
+    pub street_name: String,
+    pub zip_code: String,
+    pub city: String,
     pub address: Option<String>,
     pub phone: Option<String>,
 }
@@ -26,8 +27,3 @@ impl fmt::Display for ActorsAddresses {
         write!(f, "{}", self.uid)
     }
 }
-
-crud!(ActorsAddresses{});
-impl_select!(ActorsAddresses{select_by_uid(uid:String) -> Option => "`where uid = #{uid}`"});
-impl_select!(ActorsAddresses{select_by_actor_uid(uid:String) => "`where actor_uid = #{uid}`"});
-impl_select!(ActorsAddresses{select_by_actor_uids(uids:String) => "`where actor_uid in (${uids})`"});
